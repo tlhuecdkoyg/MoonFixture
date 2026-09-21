@@ -159,6 +159,13 @@ pub fn Plan::generate(self : Plan) -> Result[Dataset, Issue] {
   for ei in self.entity_order {
     let entity = self.model.entities[ei]
     let sets : Array[Map[String, Bool]] = entity.fields.map(_ => Map([]))
+    let domains = entity.fields.map(field => {
+      if field.unique || field.primary {
+        unique_domain(field.generator, tables)
+      } else {
+        None
+      }
+    })
     for field in entity.fields {
       if (field.unique || field.primary) && field.null_per_mille == 0 {
         if finite_capacity(field.generator) is Some(capacity) &&
@@ -193,10 +200,23 @@ pub fn Plan::generate(self : Plan) -> Result[Dataset, Issue] {
             rng.below(1000).unwrap() < field.null_per_mille {
             Null
           } else {
-            match
-              generate_value(field.generator, rng, index, row, tables, path) {
-              Ok(value) => value
-              Err(error) => return Err(error)
+            match domains[fi] {
+              Some(domain) =>
+                match domain.draw(rng) {
+                  Some(value) => value
+                  None =>
+                    return Err(
+                      issue(
+                        "unsatisfiable_unique", path, "Unique domain has no remaining non-null values",
+                      ),
+                    )
+                }
+              None =>
+                match
+                  generate_value(field.generator, rng, index, row, tables, path) {
+                  Ok(value) => value
+                  Err(error) => return Err(error)
+                }
             }
           }
           if field.primary && value == Null {

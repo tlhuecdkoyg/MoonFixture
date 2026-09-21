@@ -1,5 +1,5 @@
 ///|
-/// Immutable-by-convention plan owned by the engine, generated only by compile.
+/// A plan owns a deep snapshot of its validated model.
 pub struct Plan {
   model : Model
   context : Context
@@ -296,7 +296,7 @@ pub fn compile(
       Err(errors) => return Err(errors)
     }
   }
-  Ok({ model, context, entity_order, field_orders, })
+  Ok({ model: model.snapshot(), context, entity_order, field_orders, })
 }
 
 ///|
