@@ -1,0 +1,36 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "tlhuecdkoyg/MoonFixture/cli"
+
+// Values
+pub fn execute(String, Options, model_text? : String) -> Output
+
+pub fn help() -> String
+
+pub fn parse_args(Array[String]) -> Result[Options, String]
+
+// Errors
+
+// Types and methods
+pub(all) struct Options {
+  command : String
+  input : String
+  output : String?
+  model_file : String?
+  seed : UInt
+  reference_time : String
+  format : String
+  table : String?
+  batch_size : Int
+  max_input : Int
+  overwrite : Bool
+}
+
+pub(all) struct Output {
+  text : String
+  diagnostics : Array[String]
+  exit_code : Int
+}
+
+// Type aliases
+
+// Traits

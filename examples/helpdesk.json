@@ -1,0 +1,22 @@
+{
+  "name":"helpdesk",
+  "entities":[
+    {"name":"teams","count":4,"fields":[
+      {"name":"id","primary":true,"generator":{"kind":"sequence","start":1,"step":1}},
+      {"name":"name","unique":true,"generator":{"kind":"choice","values":["Platform","Support","Mobile","Web"]}}
+    ]},
+    {"name":"agents","count":16,"fields":[
+      {"name":"id","primary":true,"generator":{"kind":"sequence","start":1,"step":1}},
+      {"name":"team_id","generator":{"kind":"reference","entity":"teams","key":"id"}},
+      {"name":"alias","generator":{"kind":"pattern","alphabet":"abcxyz","length":6}}
+    ]},
+    {"name":"tickets","count":80,"fields":[
+      {"name":"id","primary":true,"generator":{"kind":"sequence","start":100,"step":1}},
+      {"name":"agent_id","generator":{"kind":"reference","entity":"agents","key":"id"}},
+      {"name":"team_id","generator":{"kind":"lookup","field":"agent_id","entity":"agents","key":"id","value":"team_id"}},
+      {"name":"priority","generator":{"kind":"choice","values":["low","normal","urgent"]}},
+      {"name":"due_on","generator":{"kind":"date_offset","min":1,"max":14}},
+      {"name":"note","null_per_mille":250,"generator":{"kind":"pattern","alphabet":"abc 中文","length":24}}
+    ]}
+  ]
+}

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MoonFixture 数据集预览</title>
+<style>
+body{font:16px system-ui;max-width:1000px;margin:40px auto;padding:0 20px;color:#172337;background:#f6f8fc}header{margin-bottom:24px}table{border-collapse:collapse;width:100%;background:white}th,td{border:1px solid #dce2ee;text-align:left;padding:10px;overflow-wrap:anywhere}button,select,input{font:inherit;margin:6px;padding:8px}#status{min-height:1.5em}footer{margin-top:20px;color:#536177}
+</style>
+<header><h1>MoonFixture 数据集预览</h1><p>选择 CLI 生成的 JSON 文件，即可查看实体、分页和空状态。数据仅在浏览器内读取。</p></header>
+<input type="file" id="file" accept=".json,application/json">
+<label>实体 <select id="entity"></select></label>
+<button id="previous">上一页</button><button id="next">下一页</button>
+<p id="status" role="status"></p><table><thead></thead><tbody></tbody></table>
+<footer>每页 10 行。测试空状态时，可将不被其他实体引用的表 count 设为 0 后重新生成。</footer>
+<script type="module">
+let tables=[],page=0;
+const file=document.querySelector('#file'),entity=document.querySelector('#entity'),status=document.querySelector('#status');
+function render(){
+  const table=tables[Number(entity.value)],head=document.querySelector('thead'),body=document.querySelector('tbody');
+  head.replaceChildren();body.replaceChildren();
+  if(!table){status.textContent='请选择 MoonFixture 数据集文件';return;}
+  const total=table.rows.length,last=Math.max(0,Math.ceil(total/10)-1);page=Math.min(page,last);
+  const columns=[...new Set(table.rows.flatMap(Object.keys))];
+  const header=document.createElement('tr');for(const name of columns){const cell=document.createElement('th');cell.textContent=name;header.append(cell);}head.append(header);
+  for(const row of table.rows.slice(page*10,page*10+10)){const tr=document.createElement('tr');for(const name of columns){const td=document.createElement('td');td.textContent=row[name]===null?'null':String(row[name]??'');tr.append(td);}body.append(tr);}
+  status.textContent=total?`${table.name}：共 ${total} 行，第 ${page+1}/${last+1} 页`:`${table.name}：暂无数据`;
+  document.querySelector('#previous').disabled=page===0;document.querySelector('#next').disabled=page===last;
+}
+file.addEventListener('change',async()=>{try{const data=JSON.parse(await file.files[0].text());if(data.format!=='moonfixture.dataset.v1'||!Array.isArray(data.tables))throw Error('不是 MoonFixture 数据集');for(const table of data.tables){if(typeof table.name!=='string'||!Array.isArray(table.rows)||table.rows.some(row=>!row||typeof row!=='object'||Array.isArray(row)))throw Error('无效的表结构');}tables=data.tables;page=0;entity.replaceChildren();tables.forEach((table,i)=>{const option=document.createElement('option');option.value=i;option.textContent=table.name;entity.append(option);});render();}catch(error){tables=[];entity.replaceChildren();render();status.textContent=error.message;}});
+entity.addEventListener('change',()=>{page=0;render();});document.querySelector('#previous').addEventListener('click',()=>{page=Math.max(0,page-1);render();});document.querySelector('#next').addEventListener('click',()=>{page++;render();});render();
+</script>
+</html>

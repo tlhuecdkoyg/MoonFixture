@@ -1,0 +1,29 @@
+{
+  "name": "shop",
+  "entities": [
+    {"name":"users","count":12,"fields":[
+      {"name":"id","primary":true,"generator":{"kind":"sequence","start":1,"step":1}},
+      {"name":"handle","unique":true,"generator":{"kind":"pattern","alphabet":"abcdef0123456789","length":8}},
+      {"name":"active","generator":{"kind":"boolean","chance":800}}
+    ]},
+    {"name":"products","count":8,"fields":[
+      {"name":"id","primary":true,"generator":{"kind":"sequence","start":100,"step":1}},
+      {"name":"price_cents","generator":{"kind":"integer","min":100,"max":9999}},
+      {"name":"label","generator":{"kind":"choice","values":["Notebook","中文标签","a,\"quoted\"","Robert'); DROP TABLE users;--"]}}
+    ]},
+    {"name":"orders","count":40,"fields":[
+      {"name":"id","primary":true,"generator":{"kind":"sequence","start":1000,"step":1}},
+      {"name":"user_id","generator":{"kind":"reference","entity":"users","key":"id"}},
+      {"name":"status","generator":{"kind":"choice","values":["pending","paid","cancelled"]}},
+      {"name":"created_on","generator":{"kind":"date_offset","min":-30,"max":0}}
+    ]},
+    {"name":"order_lines","count":120,"fields":[
+      {"name":"id","primary":true,"generator":{"kind":"sequence","start":1,"step":1}},
+      {"name":"order_id","generator":{"kind":"reference","entity":"orders","key":"id"}},
+      {"name":"product_id","generator":{"kind":"reference","entity":"products","key":"id"}},
+      {"name":"quantity","generator":{"kind":"integer","min":1,"max":5}},
+      {"name":"unit_price","generator":{"kind":"lookup","field":"product_id","entity":"products","key":"id","value":"price_cents"}},
+      {"name":"total_cents","generator":{"kind":"multiply","left":"quantity","right":"unit_price"}}
+    ]}
+  ]
+}

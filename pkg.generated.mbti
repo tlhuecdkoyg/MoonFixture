@@ -1,0 +1,394 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "tlhuecdkoyg/MoonFixture"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn algorithm_version() -> String
+
+pub fn check_expectations(Dataset, Array[Expectation], max_issues? : Int) -> ValidationReport
+
+pub fn compare_datasets(Model, Dataset, Dataset, max_differences? : Int) -> Result[Comparison, Issue]
+
+pub fn compile(Model, context? : Context) -> Result[Plan, Array[Issue]]
+
+pub fn generate(Model, context? : Context) -> Result[Dataset, Array[Issue]]
+
+pub fn parse_dataset(String, max_units? : Int, limits? : Limits) -> Result[Dataset, Issue]
+
+pub fn parse_date(String) -> Result[Date, Issue]
+
+pub fn parse_model(String, max_units? : Int) -> Result[Model, Issue]
+
+pub fn replay(String, max_units? : Int) -> Result[Dataset, Array[Issue]]
+
+pub fn sqlite_bundle(Model, Dataset, batch_size? : Int) -> Result[SqliteBundle, Array[Issue]]
+
+pub fn stream(UInt, String, String, Int, attempt? : Int) -> Random
+
+pub fn validate_dataset(Model, Dataset, max_issues? : Int, check_counts? : Bool) -> ValidationReport
+
+// Errors
+pub suberror ConfigError {
+  InvalidConfig(String, String)
+} derive(@debug.Debug)
+pub fn ConfigError::to_repr(Self) -> @debug.Repr
+
+// Types and methods
+pub(all) struct BatchProgress {
+  rows_accepted : Int
+  batches_accepted : Int
+  completed : Bool
+}
+
+pub(all) struct Cell {
+  name : String
+  value : Value
+} derive(Eq, @debug.Debug)
+pub fn Cell::equal(Self, Self) -> Bool
+pub fn Cell::not_equal(Self, Self) -> Bool
+pub fn Cell::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Comparison {
+  differences : Array[Difference]
+  truncated : Bool
+}
+pub fn Comparison::equal(Self) -> Bool
+pub fn Comparison::to_json(Self) -> Json
+
+pub(all) struct Context {
+  seed : UInt
+  reference_time : String
+  limits : Limits
+} derive(Eq, @debug.Debug)
+pub fn Context::equal(Self, Self) -> Bool
+pub fn Context::new(UInt, reference_time? : String, limits? : Limits) -> Self
+pub fn Context::not_equal(Self, Self) -> Bool
+pub fn Context::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Dataset {
+  model : String
+  seed : UInt
+  algorithm : String
+  reference_time : String
+  tables : Array[Table]
+} derive(Eq, @debug.Debug)
+pub fn Dataset::equal(Self, Self) -> Bool
+pub fn Dataset::mutate(Self, Model, Array[Mutation]) -> Result[MutationResult, Issue]
+pub fn Dataset::not_equal(Self, Self) -> Bool
+pub fn Dataset::profile_json(Self) -> Json
+pub fn Dataset::snapshot(Self) -> Self
+pub fn Dataset::table(Self, String) -> Table?
+pub fn Dataset::to_json_text(Self) -> String
+pub fn Dataset::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Date {
+  year : Int
+  month : Int
+  day : Int
+} derive(Eq, @debug.Debug)
+pub fn Date::add_days(Self, Int) -> Result[Self, Issue]
+pub fn Date::equal(Self, Self) -> Bool
+pub fn Date::new(Int, Int, Int) -> Result[Self, Issue]
+pub fn Date::not_equal(Self, Self) -> Bool
+pub fn Date::ordinal(Self) -> Result[Int, Issue]
+pub fn Date::to_repr(Self) -> @debug.Repr
+pub fn Date::to_string(Self) -> String
+
+pub(all) struct Difference {
+  kind : String
+  table : String
+  row_key : String
+  field : String
+  before : Value?
+  after : Value?
+}
+pub fn Difference::to_json(Self) -> Json
+
+pub(all) struct Entity {
+  name : String
+  count : Int
+  fields : Array[Field]
+} derive(Eq, @debug.Debug)
+pub fn Entity::equal(Self, Self) -> Bool
+pub fn Entity::field(Self, String) -> Field?
+pub fn Entity::not_equal(Self, Self) -> Bool
+pub fn Entity::to_repr(Self) -> @debug.Repr
+
+pub(all) struct EntityPlan {
+  name : String
+  rows : Int
+  cells : Int64
+  fields : Array[FieldPlan]
+}
+pub fn EntityPlan::to_json(Self) -> Json
+
+pub(all) enum Expectation {
+  RowCount(String, Int, Int)
+  NonNull(String, String)
+  IntegerBounds(String, String, Int, Int)
+  TextLength(String, String, Int, Int)
+  LessEqual(String, String, String)
+  SumEquals(String, String, Int64)
+  RelatedCount(String, String, String, String, Int, Int)
+}
+
+pub(all) struct Field {
+  name : String
+  generator : Generator
+  unique : Bool
+  primary : Bool
+  null_per_mille : Int
+} derive(Eq, @debug.Debug)
+pub fn Field::equal(Self, Self) -> Bool
+pub fn Field::new(String, Generator, unique? : Bool, primary? : Bool, null_per_mille? : Int) -> Self
+pub fn Field::not_equal(Self, Self) -> Bool
+pub fn Field::to_json(Self) -> Json
+pub fn Field::to_repr(Self) -> @debug.Repr
+
+pub(all) struct FieldPlan {
+  name : String
+  evaluation_index : Int
+  unique : Bool
+  primary : Bool
+  finite_capacity : String?
+  local_dependencies : Array[String]
+  parent_entity : String?
+}
+pub fn FieldPlan::to_json(Self) -> Json
+
+pub(all) struct FieldProfile {
+  name : String
+  present : Int
+  missing : Int
+  nulls : Int
+  booleans : Int
+  true_values : Int
+  integers : Int
+  texts : Int
+  distinct : Int
+  min_integer : Int?
+  max_integer : Int?
+  sum_integer : Int64
+  min_text_length : Int?
+  max_text_length : Int?
+}
+pub fn FieldProfile::to_json(Self) -> Json
+
+pub(all) enum Generator {
+  Constant(Value)
+  Sequence(Int, Int)
+  IntegerRange(Int, Int)
+  BooleanChance(Int)
+  Choice(Array[Value])
+  WeightedChoice(Array[(Value, Int)])
+  Pattern(String, Int)
+  DateOffset(Int, Int)
+  Reference(String, String)
+  Copy(String)
+  Add(String, String)
+  Multiply(String, String)
+  Concat(Array[String], String)
+  Lookup(String, String, String, String)
+} derive(Eq, @debug.Debug)
+pub fn Generator::entity_dependency(Self) -> String?
+pub fn Generator::equal(Self, Self) -> Bool
+pub fn Generator::field_dependencies(Self) -> Array[String]
+pub fn Generator::not_equal(Self, Self) -> Bool
+pub fn Generator::snapshot(Self) -> Self
+pub fn Generator::to_json(Self) -> Json
+pub fn Generator::to_repr(Self) -> @debug.Repr
+
+pub(all) struct GroupSummary {
+  key : Value
+  count : Int
+  integer_count : Int
+  null_count : Int
+  sum : Int64
+  min : Int?
+  max : Int?
+}
+pub fn GroupSummary::to_json(Self) -> Json
+
+pub(all) struct Issue {
+  code : String
+  path : String
+  message : String
+} derive(Eq, @debug.Debug)
+pub fn Issue::equal(Self, Self) -> Bool
+pub fn Issue::not_equal(Self, Self) -> Bool
+pub fn Issue::to_json(Self) -> Json
+pub fn Issue::to_repr(Self) -> @debug.Repr
+
+pub(all) enum JoinMode {
+  Inner
+  Left
+}
+
+pub(all) struct Limits {
+  max_entities : Int
+  max_fields : Int
+  max_rows : Int
+  max_cells : Int
+  max_attempts : Int
+  max_text_units : Int
+} derive(Eq, @debug.Debug)
+pub fn Limits::default() -> Self
+pub fn Limits::equal(Self, Self) -> Bool
+pub fn Limits::not_equal(Self, Self) -> Bool
+pub fn Limits::to_json(Self) -> Json
+pub fn Limits::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Model {
+  name : String
+  entities : Array[Entity]
+} derive(Eq, @debug.Debug)
+pub fn Model::entity(Self, String) -> Entity?
+pub fn Model::equal(Self, Self) -> Bool
+pub fn Model::fingerprint(Self) -> String
+pub fn Model::not_equal(Self, Self) -> Bool
+pub fn Model::snapshot(Self) -> Self
+pub fn Model::to_json(Self) -> Json
+pub fn Model::to_json_text(Self) -> String
+pub fn Model::to_repr(Self) -> @debug.Repr
+pub fn Model::with_scenario(Self, Scenario) -> Result[Self, Array[Issue]]
+
+pub(all) enum Mutation {
+  SetCell(String, Int, String, Value)
+  RemoveCell(String, Int, String)
+  DeleteRow(String, Int)
+  DuplicateRow(String, Int)
+} derive(Eq, @debug.Debug)
+pub fn Mutation::equal(Self, Self) -> Bool
+pub fn Mutation::not_equal(Self, Self) -> Bool
+pub fn Mutation::to_repr(Self) -> @debug.Repr
+
+pub(all) struct MutationResult {
+  dataset : Dataset
+  operations : Array[Mutation]
+  report : ValidationReport
+}
+
+pub(all) enum Override {
+  Count(String, Int)
+  Generator(String, String, Generator)
+  Nullable(String, String, Int)
+} derive(Eq, @debug.Debug)
+pub fn Override::equal(Self, Self) -> Bool
+pub fn Override::not_equal(Self, Self) -> Bool
+pub fn Override::to_repr(Self) -> @debug.Repr
+
+pub struct Plan {
+  model : Model
+  context : Context
+  entity_order : Array[Int]
+  field_orders : Array[Array[Int]]
+} derive(@debug.Debug)
+pub fn Plan::context(Self) -> Context
+pub fn Plan::entity_names(Self) -> Array[String]
+pub fn Plan::generate(Self) -> Result[Dataset, Issue]
+pub fn Plan::model(Self) -> Model
+pub fn Plan::replay_json(Self) -> String
+pub fn Plan::report(Self) -> PlanReport
+pub fn Plan::to_repr(Self) -> @debug.Repr
+
+pub(all) struct PlanReport {
+  model : String
+  fingerprint : String
+  rows : Int64
+  cells : Int64
+  entities : Array[EntityPlan]
+  notes : Array[String]
+}
+pub fn PlanReport::to_json(Self) -> Json
+
+pub struct Random {
+  mut state : UInt
+} derive(@debug.Debug)
+pub fn Random::below(Self, Int) -> Int?
+pub fn Random::new(UInt) -> Self
+pub fn Random::next(Self) -> UInt
+pub fn Random::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Row {
+  cells : Array[Cell]
+} derive(Eq, @debug.Debug)
+pub fn Row::equal(Self, Self) -> Bool
+pub fn Row::get(Self, String) -> Value?
+pub fn Row::not_equal(Self, Self) -> Bool
+pub fn Row::to_json(Self) -> Json
+pub fn Row::to_json_text(Self) -> String
+pub fn Row::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Scenario {
+  name : String
+  overrides : Array[Override]
+}
+
+pub(all) struct SqlBatch {
+  table : String
+  sql : String
+  parameters : Array[Array[Value]]
+}
+
+pub(all) struct SqliteBundle {
+  schema : Array[String]
+  batches : Array[SqlBatch]
+}
+pub fn SqliteBundle::to_json(Self) -> Json
+pub fn SqliteBundle::to_json_text(Self) -> String
+
+pub(all) struct Table {
+  name : String
+  rows : Array[Row]
+} derive(Eq, @debug.Debug)
+pub fn Table::batches(Self, Int) -> Result[Array[Array[Row]], Issue]
+pub fn Table::equal(Self, Self) -> Bool
+pub fn Table::group_sum(Self, String, String) -> Result[Array[GroupSummary], Issue]
+pub fn Table::join_parent(Self, Self, String, String, Array[String], prefix? : String, mode? : JoinMode) -> Result[Self, Issue]
+pub fn Table::not_equal(Self, Self) -> Bool
+pub fn Table::page(Self, Int, Int) -> Result[Self, Issue]
+pub fn Table::profile(Self) -> TableProfile
+pub fn Table::project(Self, Array[String]) -> Result[Self, Issue]
+pub fn Table::to_csv(Self, Array[String]) -> String
+pub fn Table::to_json_text(Self) -> String
+pub fn Table::to_ndjson(Self) -> String
+pub fn Table::to_repr(Self) -> @debug.Repr
+pub fn Table::visit_batches(Self, Int, (Array[Row]) -> Bool, offset? : Int) -> Result[BatchProgress, Issue]
+pub fn Table::visit_csv(Self, Array[String], Int, (String) -> Bool, offset? : Int) -> Result[BatchProgress, Issue]
+pub fn Table::visit_ndjson(Self, Int, (String) -> Bool, offset? : Int) -> Result[BatchProgress, Issue]
+pub fn Table::where_equal(Self, String, Value) -> Self
+
+pub(all) struct TableProfile {
+  name : String
+  rows : Int
+  fields : Array[FieldProfile]
+}
+pub fn TableProfile::to_json(Self) -> Json
+
+pub(all) struct ValidationReport {
+  issues : Array[Issue]
+  checked_rows : Int
+  truncated : Bool
+}
+pub fn ValidationReport::is_valid(Self) -> Bool
+pub fn ValidationReport::to_json(Self) -> Json
+
+pub(all) enum Value {
+  Null
+  Boolean(Bool)
+  Integer(Int)
+  Text(String)
+} derive(Eq, @debug.Debug)
+pub fn Value::display(Self) -> String
+pub fn Value::equal(Self, Self) -> Bool
+pub fn Value::key(Self) -> String
+pub fn Value::not_equal(Self, Self) -> Bool
+pub fn Value::to_json(Self) -> Json
+pub fn Value::to_repr(Self) -> @debug.Repr
+
+// Type aliases
+
+// Traits
