@@ -11,3 +11,8 @@ license = "Apache-2.0"
 description = "Reproducible relational test data construction for MoonBit."
 
 preferred_target = "wasm"
+
+import {
+  "moonbitlang/async@0.22.1",
+  "moonbitlang/x@0.5.5",
+}
