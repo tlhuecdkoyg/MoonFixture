@@ -26,6 +26,7 @@ fn value_matches(generator : Generator, value : Value, index : Int) -> Bool {
     (BooleanChance(1000), Boolean(actual)) => actual
     (BooleanChance(_), Boolean(_)) => true
     (Choice(values), actual) => values.contains(actual)
+    (WeightedChoice(values), actual) => values.any(pair => pair.0 == actual)
     (Pattern(alphabet, length), Text(actual)) => {
       let chars = actual.to_array()
       chars.length() == length &&

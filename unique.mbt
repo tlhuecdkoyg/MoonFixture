@@ -6,17 +6,20 @@ priv struct UniqueDomain {
   swaps : Map[Int, Int]
   values : Array[Value]
   alphabet : Array[Char]
+  reference_time : String
 }
 
 ///|
 fn unique_domain(
   generator : Generator,
   tables : Map[String, Table],
+  reference_time : String,
 ) -> UniqueDomain? {
   let values : Array[Value] = []
   let alphabet : Array[Char] = []
   let size = match generator {
-    IntegerRange(min, max) => (max.to_int64() - min.to_int64() + 1L).to_int()
+    IntegerRange(min, max) | DateOffset(min, max) =>
+      (max.to_int64() - min.to_int64() + 1L).to_int()
     BooleanChance(chance) => {
       if chance < 1000 {
         values.push(Boolean(false))
@@ -66,7 +69,14 @@ fn unique_domain(
     }
     _ => return None
   }
-  Some({ generator, remaining: size, swaps: Map([]), values, alphabet, })
+  Some({
+    generator,
+    remaining: size,
+    swaps: Map([]),
+    values,
+    alphabet,
+    reference_time,
+  })
 }
 
 ///|
@@ -81,6 +91,16 @@ fn UniqueDomain::draw(self : UniqueDomain, rng : Random) -> Value? {
   self.remaining = last
   match self.generator {
     IntegerRange(min, _) => Some(Integer(min + index))
+    DateOffset(min, _) =>
+      Some(
+        Text(
+          reference_date(self.reference_time)
+          .unwrap()
+          .add_days(min + index)
+          .unwrap()
+          .to_string(),
+        ),
+      )
     Pattern(_, length) => {
       let out = StringBuilder()
       let mut rank = index

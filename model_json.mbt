@@ -38,6 +38,19 @@ pub fn Generator::to_json(self : Generator) -> Json {
       kind("choice")
       fields["values"] = Json::array(values.map(v => v.to_json()))
     }
+    WeightedChoice(values) => {
+      kind("weighted_choice")
+      fields["values"] = Json::array(
+        values.map(pair => {
+          Json::object(
+            Map([
+              ("value", pair.0.to_json()),
+              ("weight", Json::number(pair.1.to_double())),
+            ]),
+          )
+        }),
+      )
+    }
     Pattern(alphabet, length) => {
       kind("pattern")
       text("alphabet", alphabet)
@@ -225,6 +238,9 @@ pub fn replay(
   text : String,
   max_units? : Int = 1048576,
 ) -> Result[Dataset, Array[Issue]] {
+  if guard_json(text, max_units, "replay") is Err(error) {
+    return Err([error])
+  }
   if max_units <= 0 || text.length() > max_units {
     return Err([issue("config_limit", "replay", "Replay exceeds input limit")])
   }

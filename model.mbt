@@ -5,6 +5,7 @@ pub(all) enum Generator {
   IntegerRange(Int, Int)
   BooleanChance(Int)
   Choice(Array[Value])
+  WeightedChoice(Array[(Value, Int)])
   Pattern(String, Int)
   DateOffset(Int, Int)
   Reference(String, String)

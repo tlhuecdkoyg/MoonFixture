@@ -84,6 +84,9 @@ pub fn parse_dataset(
   max_units? : Int = 16777216,
   limits? : Limits = Limits::default(),
 ) -> Result[Dataset, Issue] {
+  if guard_json(text, max_units, "dataset") is Err(error) {
+    return Err(error)
+  }
   if max_units <= 0 || text.length() > max_units {
     return Err(
       issue("input_limit", "dataset", "Dataset input exceeds configured limit"),

@@ -14,6 +14,7 @@ fn generate_value(
   index : Int,
   row : Row,
   tables : Map[String, Table],
+  indexes : Map[String, Map[String, Row]],
   path : String,
   reference_time : String,
 ) -> Result[Value, Issue] {
@@ -37,6 +38,20 @@ fn generate_value(
       }
     }
     Choice(values) => Ok(values[rng.below(values.length()).unwrap()])
+    WeightedChoice(values) => {
+      let mut total = 0
+      for (_, weight) in values {
+        total += weight
+      }
+      let mut chosen = rng.below(total).unwrap()
+      for (value, weight) in values {
+        if chosen < weight {
+          return Ok(value)
+        }
+        chosen -= weight
+      }
+      Err(issue("weight_total", path, "Weighted choice is empty"))
+    }
     Pattern(alphabet, length) => {
       let chars = alphabet.to_array()
       let result = StringBuilder()
@@ -109,14 +124,15 @@ fn generate_value(
           issue("invalid_lookup", path, "Lookup key is missing or null"),
         )
       }
-      for parent in tables.get(target).unwrap().rows {
-        if parent.get(key) == selected {
+      match
+        indexes.get(target + "." + key).unwrap().get(selected.unwrap().key()) {
+        Some(parent) =>
           return match parent.get(value_field) {
             Some(value) => Ok(value)
             None =>
               Err(issue("missing_lookup", path, "Lookup value is missing"))
           }
-        }
+        None => ()
       }
       Err(
         issue("unmatched_lookup", path, "No parent row matches the local key"),
@@ -128,6 +144,7 @@ fn generate_value(
 ///|
 fn finite_capacity(generator : Generator) -> Int64? {
   match generator {
+    Constant(Null) => None
     Constant(_) => Some(1L)
     BooleanChance(0 | 1000) => Some(1L)
     BooleanChance(_) => Some(2L)
@@ -136,6 +153,13 @@ fn finite_capacity(generator : Generator) -> Int64? {
     Choice(values) => {
       let keys : Map[String, Bool] = Map([])
       for value in values {
+        keys[value.key()] = true
+      }
+      Some(keys.length().to_int64())
+    }
+    WeightedChoice(values) => {
+      let keys : Map[String, Bool] = Map([])
+      for (value, _) in values {
         keys[value.key()] = true
       }
       Some(keys.length().to_int64())
@@ -163,6 +187,7 @@ fn finite_capacity(generator : Generator) -> Int64? {
 /// Construct a dataset. On failure no partial dataset is returned.
 pub fn Plan::generate(self : Plan) -> Result[Dataset, Issue] {
   let tables : Map[String, Table] = Map([])
+  let indexes : Map[String, Map[String, Row]] = Map([])
   let result : Array[Table] = []
   let mut text_units = 0L
   for ei in self.entity_order {
@@ -170,7 +195,7 @@ pub fn Plan::generate(self : Plan) -> Result[Dataset, Issue] {
     let sets : Array[Map[String, Bool]] = entity.fields.map(_ => Map([]))
     let domains = entity.fields.map(field => {
       if field.unique || field.primary {
-        unique_domain(field.generator, tables)
+        unique_domain(field.generator, tables, self.context.reference_time)
       } else {
         None
       }
@@ -228,6 +253,7 @@ pub fn Plan::generate(self : Plan) -> Result[Dataset, Issue] {
                     index,
                     row,
                     tables,
+                    indexes,
                     path,
                     self.context.reference_time,
                   ) {
@@ -281,6 +307,17 @@ pub fn Plan::generate(self : Plan) -> Result[Dataset, Issue] {
       })
     }
     let table : Table = { name: entity.name, rows, }
+    for field in entity.fields {
+      if field.unique || field.primary {
+        let entries : Map[String, Row] = Map([])
+        for row in rows {
+          if row.get(field.name) is Some(value) && value != Null {
+            entries[value.key()] = row
+          }
+        }
+        indexes[entity.name + "." + field.name] = entries
+      }
+    }
     tables[entity.name] = table
     result.push(table)
   }

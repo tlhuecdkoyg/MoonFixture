@@ -79,6 +79,26 @@ fn check_generator(generator : Generator, path : String) -> Array[Issue] {
         )
       }
     }
+    WeightedChoice(values) => {
+      let mut total = 0L
+      for (value, weight) in values {
+        if value == Null || weight <= 0 {
+          errors.push(
+            issue(
+              "invalid_weight", path, "Weighted values must be non-null with positive weights",
+            ),
+          )
+        }
+        total += weight.to_int64()
+      }
+      if total <= 0L || total > 2147483647L {
+        errors.push(
+          issue(
+            "weight_total", path, "Total choice weight must be 1..2147483647",
+          ),
+        )
+      }
+    }
     Pattern(alphabet, length) =>
       if alphabet.is_empty() || length < 0 || length > 65536 {
         errors.push(

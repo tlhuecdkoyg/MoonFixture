@@ -3,6 +3,7 @@
 pub fn Generator::snapshot(self : Generator) -> Generator {
   match self {
     Choice(values) => Choice(values.copy())
+    WeightedChoice(values) => WeightedChoice(values.copy())
     Concat(names, separator) => Concat(names.copy(), separator)
     _ => self
   }

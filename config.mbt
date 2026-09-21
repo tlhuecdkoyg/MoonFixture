@@ -114,6 +114,7 @@ fn parse_generator(value : Json, path : String) -> Generator raise ConfigError {
     "date_offset" => ["kind", "min", "max"]
     "boolean" => ["kind", "chance"]
     "choice" => ["kind", "values"]
+    "weighted_choice" => ["kind", "values"]
     "pattern" => ["kind", "alphabet", "length"]
     "reference" => ["kind", "entity", "key"]
     "copy" => ["kind", "field"]
@@ -136,6 +137,31 @@ fn parse_generator(value : Json, path : String) -> Generator raise ConfigError {
         path + ".values",
       )
       Choice(items.map(v => scalar_value(v, path + ".values")))
+    }
+    "weighted_choice" => {
+      let items = array_value(
+        required(fields, "values", path),
+        path + ".values",
+      )
+      let values : Array[(Value, Int)] = []
+      for index in 0..<items.length() {
+        let item_path = path + ".values[" + index.to_string() + "]"
+        let item = object_fields(items[index], item_path)
+        reject_unknown(item, ["value", "weight"], item_path)
+        values.push(
+          (
+            scalar_value(
+              required(item, "value", item_path),
+              item_path + ".value",
+            ),
+            integer_value(
+              required(item, "weight", item_path),
+              item_path + ".weight",
+            ),
+          ),
+        )
+      }
+      WeightedChoice(values)
     }
     "pattern" => Pattern(text("alphabet"), int("length"))
     "reference" => Reference(text("entity"), text("key"))
@@ -217,6 +243,9 @@ pub fn parse_model(
   text : String,
   max_units? : Int = 1048576,
 ) -> Result[Model, Issue] {
+  if guard_json(text, max_units, "model") is Err(error) {
+    return Err(error)
+  }
   if max_units <= 0 || text.length() > max_units {
     return Err(
       issue("config_limit", "model", "Model text exceeds configured size"),
