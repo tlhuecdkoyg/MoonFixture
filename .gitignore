@@ -1,0 +1,5 @@
+_build/
+.mooncakes/
+*.db
+*.db-journal
+__pycache__/
