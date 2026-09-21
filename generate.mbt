@@ -17,6 +17,7 @@ fn generate_value(
   indexes : Map[String, Map[String, Row]],
   path : String,
   reference_time : String,
+  remaining_text_units : Int,
 ) -> Result[Value, Issue] {
   match generator {
     Constant(value) => Ok(value)
@@ -53,6 +54,11 @@ fn generate_value(
       Err(issue("weight_total", path, "Weighted choice is empty"))
     }
     Pattern(alphabet, length) => {
+      if length > remaining_text_units {
+        return Err(
+          issue("text_limit", path, "Pattern exceeds remaining text budget"),
+        )
+      }
       let chars = alphabet.to_array()
       let result = StringBuilder()
       for _ in 0..<length {
@@ -106,9 +112,22 @@ fn generate_value(
       }
     Concat(names, separator) => {
       let parts : Array[String] = []
+      let mut length = (names.length() - 1).max(0).to_int64() *
+        separator.length().to_int64()
       for name in names {
         match row.get(name) {
-          Some(value) => parts.push(value.display())
+          Some(value) => {
+            let text = value.display()
+            length += text.length().to_int64()
+            if length > remaining_text_units.to_int64() {
+              return Err(
+                issue(
+                  "text_limit", path, "Concatenation exceeds remaining text budget",
+                ),
+              )
+            }
+            parts.push(text)
+          }
           None =>
             return Err(
               issue("missing_dependency", path, "Unknown concat field: " + name),
@@ -256,6 +275,7 @@ pub fn Plan::generate(self : Plan) -> Result[Dataset, Issue] {
                     indexes,
                     path,
                     self.context.reference_time,
+                    (self.context.limits.max_text_units.to_int64() - text_units).to_int(),
                   ) {
                   Ok(value) => value
                   Err(error) => return Err(error)

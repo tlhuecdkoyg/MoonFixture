@@ -95,6 +95,9 @@ pub fn compare_datasets(
   after : Dataset,
   max_differences? : Int = 100,
 ) -> Result[Comparison, Issue] {
+  if compile(model) is Err(errors) {
+    return Err(errors[0])
+  }
   if max_differences <= 0 {
     return Err(
       issue("diff_limit", "comparison", "Difference limit must be positive"),

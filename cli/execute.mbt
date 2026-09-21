@@ -97,7 +97,15 @@ pub fn execute(
         Err(issues) => failure(issues)
       }
     "ndjson" | "csv" => {
-      let name = options.table.unwrap()
+      let name = match options.table {
+        Some(name) => name
+        None =>
+          return {
+            text: "",
+            diagnostics: ["This format requires a table"],
+            exit_code: 2,
+          }
+      }
       match data.table(name) {
         Some(table) =>
           if options.format == "ndjson" {
