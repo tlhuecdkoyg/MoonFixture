@@ -49,7 +49,7 @@ fn ordered_nodes(
 fn check_generator(generator : Generator, path : String) -> Array[Issue] {
   let errors : Array[Issue] = []
   match generator {
-    IntegerRange(min, max) => {
+    IntegerRange(min, max) | DateOffset(min, max) => {
       let width = max.to_int64() - min.to_int64() + 1L
       if width <= 0L || width > 2147483647L {
         errors.push(
@@ -104,6 +104,10 @@ pub fn compile(
 ) -> Result[Plan, Array[Issue]] {
   let errors : Array[Issue] = []
   let limits = context.limits
+  let reference = match reference_date(context.reference_time) {
+    Ok(date) => date
+    Err(error) => return Err([error])
+  }
   if limits.max_entities <= 0 ||
     limits.max_fields <= 0 ||
     limits.max_rows <= 0 ||
@@ -175,6 +179,14 @@ pub fn compile(
       }
       for error in check_generator(field.generator, path) {
         errors.push(error)
+      }
+      if field.generator is DateOffset(min, max) {
+        if reference.add_days(min) is Err(_) ||
+          reference.add_days(max) is Err(_) {
+          errors.push(
+            issue("date_overflow", path, "Date offset exceeds years 1..9999"),
+          )
+        }
       }
       if field.generator is Sequence(start, step) && entity.count > 0 {
         let end = start.to_int64() +

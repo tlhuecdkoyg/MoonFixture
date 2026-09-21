@@ -111,6 +111,7 @@ fn parse_generator(value : Json, path : String) -> Generator raise ConfigError {
     "constant" => ["kind", "value"]
     "sequence" => ["kind", "start", "step"]
     "integer" => ["kind", "min", "max"]
+    "date_offset" => ["kind", "min", "max"]
     "boolean" => ["kind", "chance"]
     "choice" => ["kind", "values"]
     "pattern" => ["kind", "alphabet", "length"]
@@ -127,6 +128,7 @@ fn parse_generator(value : Json, path : String) -> Generator raise ConfigError {
       Constant(scalar_value(required(fields, "value", path), path + ".value"))
     "sequence" => Sequence(int("start"), int("step"))
     "integer" => IntegerRange(int("min"), int("max"))
+    "date_offset" => DateOffset(int("min"), int("max"))
     "boolean" => BooleanChance(int("chance"))
     "choice" => {
       let items = array_value(

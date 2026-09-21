@@ -15,6 +15,7 @@ fn generate_value(
   row : Row,
   tables : Map[String, Table],
   path : String,
+  reference_time : String,
 ) -> Result[Value, Issue] {
   match generator {
     Constant(value) => Ok(value)
@@ -28,6 +29,13 @@ fn generate_value(
       Ok(Integer(min + rng.below(width).unwrap()))
     }
     BooleanChance(chance) => Ok(Boolean(rng.below(1000).unwrap() < chance))
+    DateOffset(min, max) => {
+      let delta = min + rng.below(max - min + 1).unwrap()
+      match reference_date(reference_time).unwrap().add_days(delta) {
+        Ok(date) => Ok(Text(date.to_string()))
+        Err(error) => Err(error)
+      }
+    }
     Choice(values) => Ok(values[rng.below(values.length()).unwrap()])
     Pattern(alphabet, length) => {
       let chars = alphabet.to_array()
@@ -123,7 +131,8 @@ fn finite_capacity(generator : Generator) -> Int64? {
     Constant(_) => Some(1L)
     BooleanChance(0 | 1000) => Some(1L)
     BooleanChance(_) => Some(2L)
-    IntegerRange(min, max) => Some(max.to_int64() - min.to_int64() + 1L)
+    IntegerRange(min, max) | DateOffset(min, max) =>
+      Some(max.to_int64() - min.to_int64() + 1L)
     Choice(values) => {
       let keys : Map[String, Bool] = Map([])
       for value in values {
@@ -213,7 +222,15 @@ pub fn Plan::generate(self : Plan) -> Result[Dataset, Issue] {
                 }
               None =>
                 match
-                  generate_value(field.generator, rng, index, row, tables, path) {
+                  generate_value(
+                    field.generator,
+                    rng,
+                    index,
+                    row,
+                    tables,
+                    path,
+                    self.context.reference_time,
+                  ) {
                   Ok(value) => value
                   Err(error) => return Err(error)
                 }

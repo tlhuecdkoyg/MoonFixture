@@ -6,6 +6,7 @@ pub(all) enum Generator {
   BooleanChance(Int)
   Choice(Array[Value])
   Pattern(String, Int)
+  DateOffset(Int, Int)
   Reference(String, String)
   Copy(String)
   Add(String, String)
