@@ -33,6 +33,11 @@ def main():
     args = parser.parse_args()
     suffix = ".exe" if __import__("os").name == "nt" else ""
     exe = (args.exe or ROOT / f"_build/native/debug/build/cmd/main/main{suffix}").resolve()
+    if not args.exe and not exe.exists():
+        # Moon toolchains may retain the .exe suffix on Unix as well.
+        alternate = exe.with_suffix("") if exe.suffix else exe.with_suffix(".exe")
+        if alternate.exists():
+            exe = alternate
     with tempfile.TemporaryDirectory(prefix="moonfixture-") as directory:
         temporary = Path(directory)
         for model_name in ("shop", "helpdesk"):

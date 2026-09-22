@@ -29,7 +29,7 @@ pub fn execute(
     return success(help())
   }
   if options.command == "version" {
-    return success("MoonFixture 0.1.0 (" + @fixture.algorithm_version() + ")")
+    return success("MoonFixture 0.1.1 (" + @fixture.algorithm_version() + ")")
   }
   if options.command == "replay" {
     return match @fixture.replay(input, max_units=options.max_input) {

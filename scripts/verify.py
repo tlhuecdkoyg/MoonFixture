@@ -13,6 +13,7 @@ def run(*args):
 
 if __name__ == "__main__":
     run("moon", "version", "--all")
+    run("moon", "update")
     run("moon", "check", "--target", "all", "--deny-warn")
     run("moon", "test", "--target", "all", "--deny-warn")
     run("moon", "fmt", "--check")

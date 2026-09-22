@@ -34,15 +34,15 @@ Fixture 是测试运行前准备好的数据和环境；MoonFixture 聚焦其中
 ## 作为库使用
 
 ```sh
-moon add tlhuecdkoyg/MoonFixture@0.1.0
+moon add tlhuecdkoyg/MoonFixture@0.1.1
 ```
 
-在调用包的 `moon.pkg` 中加入：
+以下示例只在黑盒测试中引用库，在调用包的 `moon.pkg` 中加入测试依赖。业务实现文件中使用该库时，移除 `for "test"`，将其声明为普通依赖：
 
 ```moonbit
 import {
   "tlhuecdkoyg/MoonFixture" @fixture,
-}
+} for "test"
 ```
 
 以下完整测试可以放入调用包的测试文件：
@@ -83,6 +83,7 @@ test "relational fixture" {
 在仓库目录执行。`moon run` 的 `--` 后为程序参数：
 
 ```sh
+moon update
 moon run cmd/main --target native -- --help
 moon run cmd/main --target native -- generate examples/shop.json --seed 2026 --output shop-data.json
 moon run cmd/main --target native -- validate shop-data.json --model examples/shop.json

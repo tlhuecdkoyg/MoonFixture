@@ -16,7 +16,7 @@ pub(all) struct Options {
 ///|
 pub fn help() -> String {
   (
-    #|MoonFixture 0.1.0 — reproducible relational test data
+    #|MoonFixture 0.1.1 — reproducible relational test data
     #|Usage: moonfixture <command> <input.json|-> [options]
     #|Commands:
     #|  generate  Build a dataset from a model
