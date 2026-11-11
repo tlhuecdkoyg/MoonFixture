@@ -98,6 +98,45 @@ pub fn sqlite_bundle(
     Ok(plan) => plan
     Err(errors) => return Err(errors)
   }
+  // Model identifiers are case-sensitive. SQLite identifiers are ASCII
+  // case-insensitive, and sqlite_ table names belong to the engine.
+  let table_names : Map[String, Bool] = Map([])
+  for entity in model.entities {
+    let folded = entity.name.to_lower()
+    if folded.has_prefix("sqlite_") {
+      return Err([
+        issue(
+          "sqlite_reserved_name",
+          entity.name,
+          "SQLite reserves table names beginning with sqlite_",
+        ),
+      ])
+    }
+    if table_names.contains(folded) {
+      return Err([
+        issue(
+          "sqlite_duplicate_table",
+          entity.name,
+          "SQLite table names must differ ignoring ASCII case",
+        ),
+      ])
+    }
+    table_names[folded] = true
+    let column_names : Map[String, Bool] = Map([])
+    for field in entity.fields {
+      let folded = field.name.to_lower()
+      if column_names.contains(folded) {
+        return Err([
+          issue(
+            "sqlite_duplicate_column",
+            entity.name + "." + field.name,
+            "SQLite column names must differ ignoring ASCII case",
+          ),
+        ])
+      }
+      column_names[folded] = true
+    }
+  }
   let schema : Array[String] = []
   let batches : Array[SqlBatch] = []
   for ei in plan.entity_order {

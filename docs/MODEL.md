@@ -2,6 +2,10 @@
 
 顶层对象包含 `name` 与 `entities`。实体包含 `name`、`count`、`fields`；字段包含 `name`、`generator`，以及可选的 `primary`、`unique`、`null_per_mille`。未知属性会报错。名称只允许 1–128 个 ASCII 字母、数字或下划线；名称可以以数字开头，SQLite 导出会引用标识符。
 
+整数配置和标量值按 JSON 数字的原始十进制文本检查，必须在 Int32 范围内且数学上为整数；`1.0`、`1e2`、`100e-2` 均可接受。`1e-400`、`1.0000000000000001` 等非整数不会因浮点舍入而被接受。模型、数据集及完整重放清单的文本入口使用相同检查。
+
+JSON 模型名称区分大小写。SQLite 导出额外拒绝忽略 ASCII 大小写后重名的表、同表重名列及以 `sqlite_` 开头的保留表名；普通模型编译和 JSON 导出不受这些 SQLite 限制影响。
+
 最小模型：
 
 ```json
@@ -35,6 +39,7 @@
 | `dependency_cycle` | 拆除循环的实体/字段依赖 |
 | `missing_entity`, `missing_field`, `missing_key` | 检查引用名称 |
 | `nonunique_reference` | 将父键配置为 unique 或 primary |
+| `invalid_reference_key` | 引用抽中了实际为 null 或缺失的父键，检查父键生成器及派生关系 |
 | `unsatisfiable_unique` | 减少行数、扩大有限域或取消唯一要求 |
 | `attempt_budget` | 增大有效域或预算；此错误不证明约束一定无解 |
 | `invalid_operand`, `arithmetic_overflow` | 修正派生字段类型或数值范围 |
@@ -42,6 +47,7 @@
 | `row_limit`, `cell_limit`, `text_limit` | 缩小数据规模或显式调整相应限制 |
 | `input_limit`, `nesting_limit` | 缩小输入或降低 JSON 嵌套层数 |
 | `foreign_key`, `derived_value`, `duplicate_key` | 外部/变异数据违反了模型约束 |
+| `sqlite_duplicate_table`, `sqlite_duplicate_column`, `sqlite_reserved_name` | 修改 SQLite 导出模型中的重名或保留名称；无需限制仅供 JSON 使用的模型 |
 
 `Scenario` 是模型覆盖：改变行数、生成器或空值概率后重新编译。`Mutation` 是生成后变异：操作按顺序执行，行下标指向前一步操作后的结果。变异失败不修改原数据；成功时返回变异后的副本、操作记录和独立校验报告。一项变异可能触发多个约束错误。
 

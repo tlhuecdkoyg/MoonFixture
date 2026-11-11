@@ -42,8 +42,17 @@ fn text_value(value : Json, path : String) -> String raise ConfigError {
 ///|
 fn integer_value(value : Json, path : String) -> Int32 raise ConfigError {
   match value {
-    Number(number, ..) => {
-      if number < -2147483648.0 || number > 2147483647.0 {
+    Number(number, repr~) => {
+      if repr is Some(text) {
+        let result = exact_json_integer(text, path)
+        if result.to_double() != number {
+          raise InvalidConfig(
+            path, "Number representation disagrees with its value",
+          )
+        }
+        return result
+      }
+      if number != number || number < -2147483648.0 || number > 2147483647.0 {
         raise InvalidConfig(path, "Integer outside Int32 bounds")
       }
       let result = number.to_int()
@@ -253,7 +262,7 @@ pub fn parse_model(
     )
   }
   try {
-    let value = @json.parse(text)
+    let value = @json.parse(text, preserve_number_repr=true)
     Ok(decode_model(value))
   } catch {
     InvalidConfig(path, message) => Err(issue("invalid_config", path, message))

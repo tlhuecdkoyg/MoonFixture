@@ -245,7 +245,10 @@ pub fn replay(
     return Err([issue("config_limit", "replay", "Replay exceeds input limit")])
   }
   try {
-    let fields = object_fields(@json.parse(text), "replay")
+    let fields = object_fields(
+      @json.parse(text, preserve_number_repr=true),
+      "replay",
+    )
     reject_unknown(
       fields,
       ["format", "algorithm", "seed", "reference_time", "limits", "model"],

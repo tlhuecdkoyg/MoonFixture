@@ -46,8 +46,13 @@ fn unique_domain(
     }
     Reference(target, key) => {
       for row in tables.get(target).unwrap().rows {
-        if row.get(key) is Some(value) {
-          values.push(value)
+        match row.get(key) {
+          // Fall back to the ordinary Reference generator, which checks the
+          // sampled key and reports invalid_reference_key instead of emitting
+          // an undeclared null. Nullable children can still choose null before
+          // invoking their generator.
+          None | Some(Null) => return None
+          Some(value) => values.push(value)
         }
       }
       values.length()

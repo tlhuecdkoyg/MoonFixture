@@ -92,7 +92,7 @@ pub fn parse_dataset(
       issue("input_limit", "dataset", "Dataset input exceeds configured limit"),
     )
   }
-  Ok(decode_dataset(@json.parse(text), limits)) catch {
+  Ok(decode_dataset(@json.parse(text, preserve_number_repr=true), limits)) catch {
     InvalidConfig(path, message) => Err(issue("invalid_dataset", path, message))
     _ => Err(issue("invalid_json", "dataset", "Invalid dataset JSON"))
   }
