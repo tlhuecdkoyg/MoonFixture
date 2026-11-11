@@ -1,5 +1,9 @@
 # MoonFixture
 
+**2026 年 11 月持续可用性维护：完成兼容性检查和必要修复。**
+维护版本为 `0.1.4`，延续 `0.1.3` 的必要修复，新增日期、关联数据、重放和分批导出组合回归。
+本轮未发现需新增修复的生成库缺陷；具体验证范围见[兼容性维护记录](docs/COMPATIBILITY-20261111.md)。
+
 [![CI](https://github.com/tlhuecdkoyg/MoonFixture/actions/workflows/ci.yml/badge.svg)](https://github.com/tlhuecdkoyg/MoonFixture/actions/workflows/ci.yml)
 
 **MoonBit 原生的可复现关联测试数据构造库。** 用一个显式模型定义实体、主外键、唯一字段和派生关系，为数据库集成测试、接口回归与前端演示生成同一套可重放数据。
@@ -19,7 +23,7 @@ Fixture 是测试运行前准备好的数据和环境；MoonFixture 聚焦其中
 
 ## 工具链与验证环境
 
-本项目于 **2026-11-11** 使用 MoonBit 官方发布通道工具链完成 `0.1.3` 补丁源码的四后端本地测试，各 **42/42** 通过。本补丁修复唯一外键抽样的空父键检查、JSON 整数导入的舍入误判，以及 SQLite 导出的名称兼容性检查。安装与 CI 固定工具链归档 **`0.10.20+65efd5b93`**；以下日期为各组件的构建日期：
+本项目于 **2026-11-11** 使用 MoonBit 官方当前发布通道工具链进行 `0.1.4` 兼容性维护。安装与 CI 固定工具链归档 **`0.10.20+65efd5b93`**；验证命令与结果见[本轮维护记录](docs/COMPATIBILITY-20261111.md)。以下日期为各组件的构建日期：
 
 | 组件 | 版本 |
 | --- | --- |
@@ -36,7 +40,7 @@ Fixture 是测试运行前准备好的数据和环境；MoonFixture 聚焦其中
 ## 作为库使用
 
 ```sh
-moon add tlhuecdkoyg/MoonFixture@0.1.3
+moon add tlhuecdkoyg/MoonFixture@0.1.4
 ```
 
 以下示例只在黑盒测试中引用库，在调用包的 `moon.pkg` 中加入测试依赖。业务实现文件中使用该库时，移除 `for "test"`，将其声明为普通依赖：
