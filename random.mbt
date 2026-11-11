@@ -1,16 +1,17 @@
 ///|
 /// Versioned xorshift32 stream; not suitable for secrets or cryptography.
+#derive(Debug)
 pub struct Random {
-  mut state : UInt
-} derive(Debug)
+  mut state : UInt32
+}
 
 ///|
-pub fn Random::new(seed : UInt) -> Random {
+pub fn Random::new(seed : UInt32) -> Random {
   { state: if seed == 0U { 0x6D2B79F5U } else { seed }, }
 }
 
 ///|
-pub fn Random::next(self : Random) -> UInt {
+pub fn Random::next(self : Random) -> UInt32 {
   let mut x = self.state
   x = x ^ (x << 13)
   x = x ^ (x >> 17)
@@ -21,7 +22,7 @@ pub fn Random::next(self : Random) -> UInt {
 
 ///|
 /// Uniform bounded selection using rejection rather than biased modulo alone.
-pub fn Random::below(self : Random, bound : Int) -> Int? {
+pub fn Random::below(self : Random, bound : Int32) -> Int32? {
   if bound <= 0 {
     return None
   }
@@ -36,7 +37,7 @@ pub fn Random::below(self : Random, bound : Int) -> Int? {
 }
 
 ///|
-fn mix_name(state : UInt, name : String) -> UInt {
+fn mix_name(state : UInt32, name : String) -> UInt32 {
   let mut hash = state
   // Scalar values are encoded into four fixed little-endian bytes.
   for char in name.iter() {
@@ -52,11 +53,11 @@ fn mix_name(state : UInt, name : String) -> UInt {
 ///|
 /// Stable stream identity is (seed, entity, field, row, attempt).
 pub fn stream(
-  seed : UInt,
+  seed : UInt32,
   entity : String,
   field : String,
-  row : Int,
-  attempt? : Int = 0,
+  row : Int32,
+  attempt~ : Int32 = 0,
 ) -> Random {
   let hash = mix_name(mix_name(2166136261U ^ seed, entity), field)
   let hash = (hash ^ row.reinterpret_as_uint()) * 16777619U

@@ -81,8 +81,8 @@ fn decode_dataset(value : Json, limits : Limits) -> Dataset raise ConfigError {
 /// Imported row fields are sorted; row/table array order is retained.
 pub fn parse_dataset(
   text : String,
-  max_units? : Int = 16777216,
-  limits? : Limits = Limits::default(),
+  max_units~ : Int32 = 16777216,
+  limits~ : Limits = Limits::default(),
 ) -> Result[Dataset, Issue] {
   if guard_json(text, max_units, "dataset") is Err(error) {
     return Err(error)

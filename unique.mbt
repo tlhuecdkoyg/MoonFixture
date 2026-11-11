@@ -2,8 +2,8 @@
 /// A lazy Fisher-Yates permutation uses memory proportional to draws, not domain.
 priv struct UniqueDomain {
   generator : Generator
-  mut remaining : Int
-  swaps : Map[Int, Int]
+  mut remaining : Int32
+  swaps : Map[Int32, Int32]
   values : Array[Value]
   alphabet : Array[Char]
   reference_time : String

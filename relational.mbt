@@ -13,8 +13,8 @@ pub fn Table::join_parent(
   local_field : String,
   parent_key : String,
   columns : Array[String],
-  prefix? : String = "parent_",
-  mode? : JoinMode = Inner,
+  prefix~ : String = "parent_",
+  mode~ : JoinMode = Inner,
 ) -> Result[Table, Issue] {
   let seen : Map[String, Bool] = Map([])
   for name in columns {
@@ -104,8 +104,8 @@ pub fn Table::join_parent(
 /// Return an independent row/field snapshot suitable for pagination assertions.
 pub fn Table::page(
   self : Table,
-  offset : Int,
-  limit : Int,
+  offset : Int32,
+  limit : Int32,
 ) -> Result[Table, Issue] {
   if offset < 0 || limit < 0 {
     return Err(
@@ -174,12 +174,12 @@ pub fn Table::project(
 ///|
 pub(all) struct GroupSummary {
   key : Value
-  count : Int
-  integer_count : Int
-  null_count : Int
+  count : Int32
+  integer_count : Int32
+  null_count : Int32
   sum : Int64
-  min : Int?
-  max : Int?
+  min : Int32?
+  max : Int32?
 }
 
 ///|
@@ -191,7 +191,7 @@ pub fn Table::group_sum(
   amount_field : String,
 ) -> Result[Array[GroupSummary], Issue] {
   let groups : Array[GroupSummary] = []
-  let indexes : Map[String, Int] = Map([])
+  let indexes : Map[String, Int32] = Map([])
   for ri in 0..<self.rows.length() {
     let row = self.rows[ri]
     let key = match row.get(key_field) {

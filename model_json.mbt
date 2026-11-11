@@ -7,7 +7,7 @@ pub fn Generator::to_json(self : Generator) -> Json {
   fn text(name : String, value : String) -> Unit {
     fields[name] = Json::string(value)
   }
-  fn number(name : String, value : Int) -> Unit {
+  fn number(name : String, value : Int32) -> Unit {
     fields[name] = Json::number(value.to_double())
   }
   match self {
@@ -185,7 +185,7 @@ fn decode_limits(value : Json, path : String) -> Limits raise ConfigError {
     ],
     path,
   )
-  fn number(name : String) -> Int raise ConfigError {
+  fn number(name : String) -> Int32 raise ConfigError {
     integer_value(required(fields, name, path), path + "." + name)
   }
   {
@@ -199,7 +199,7 @@ fn decode_limits(value : Json, path : String) -> Limits raise ConfigError {
 }
 
 ///|
-fn unsigned_decimal(text : String, path : String) -> UInt raise ConfigError {
+fn unsigned_decimal(text : String, path : String) -> UInt32 raise ConfigError {
   if text.is_empty() || text.length() > 10 {
     raise InvalidConfig(path, "Expected an unsigned 32-bit decimal string")
   }
@@ -236,7 +236,7 @@ pub fn Plan::replay_json(self : Plan) -> String {
 ///|
 pub fn replay(
   text : String,
-  max_units? : Int = 1048576,
+  max_units~ : Int32 = 1048576,
 ) -> Result[Dataset, Array[Issue]] {
   if guard_json(text, max_units, "replay") is Err(error) {
     return Err([error])

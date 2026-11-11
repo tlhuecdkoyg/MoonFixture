@@ -4,19 +4,19 @@ pub(all) struct Options {
   input : String
   output : String?
   model_file : String?
-  seed : UInt
+  seed : UInt32
   reference_time : String
   format : String
   table : String?
-  batch_size : Int
-  max_input : Int
+  batch_size : Int32
+  max_input : Int32
   overwrite : Bool
 }
 
 ///|
 pub fn help() -> String {
   (
-    #|MoonFixture 0.1.1 — reproducible relational test data
+    #|MoonFixture 0.1.2 — reproducible relational test data
     #|Usage: moonfixture <command> <input.json|-> [options]
     #|Commands:
     #|  generate  Build a dataset from a model
@@ -40,7 +40,7 @@ pub fn help() -> String {
 }
 
 ///|
-fn unsigned(text : String) -> UInt? {
+fn unsigned(text : String) -> UInt32? {
   if text.is_empty() || text.length() > 10 {
     return None
   }
@@ -58,7 +58,7 @@ fn unsigned(text : String) -> UInt? {
 }
 
 ///|
-fn positive(text : String) -> Int? {
+fn positive(text : String) -> Int32? {
   match unsigned(text) {
     Some(number) =>
       if number > 0U && number <= 2147483647U {

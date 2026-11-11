@@ -1,7 +1,7 @@
 ///|
 pub(all) struct FieldPlan {
   name : String
-  evaluation_index : Int
+  evaluation_index : Int32
   unique : Bool
   primary : Bool
   finite_capacity : String?
@@ -12,7 +12,7 @@ pub(all) struct FieldPlan {
 ///|
 pub(all) struct EntityPlan {
   name : String
-  rows : Int
+  rows : Int32
   cells : Int64
   fields : Array[FieldPlan]
 }

@@ -11,13 +11,13 @@ fn checked_integer(value : Int64, path : String) -> Result[Value, Issue] {
 fn generate_value(
   generator : Generator,
   rng : Random,
-  index : Int,
+  index : Int32,
   row : Row,
   tables : Map[String, Table],
   indexes : Map[String, Map[String, Row]],
   path : String,
   reference_time : String,
-  remaining_text_units : Int,
+  remaining_text_units : Int32,
 ) -> Result[Value, Issue] {
   match generator {
     Constant(value) => Ok(value)
@@ -353,7 +353,7 @@ pub fn Plan::generate(self : Plan) -> Result[Dataset, Issue] {
 ///|
 pub fn generate(
   model : Model,
-  context? : Context = Context::new(1U),
+  context~ : Context = Context::new(1U),
 ) -> Result[Dataset, Array[Issue]] {
   match compile(model, context~) {
     Err(errors) => Err(errors)

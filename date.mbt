@@ -1,9 +1,10 @@
 ///|
+#derive(Eq, Debug)
 pub(all) struct Date {
-  year : Int
-  month : Int
-  day : Int
-} derive(Eq, Debug)
+  year : Int32
+  month : Int32
+  day : Int32
+}
 
 ///|
 pub extend Date with Eq::{equal, not_equal}
@@ -12,12 +13,12 @@ pub extend Date with Eq::{equal, not_equal}
 pub extend Date with @moonbitlang/core/debug.Debug::{to_repr}
 
 ///|
-fn leap_year(year : Int) -> Bool {
+fn leap_year(year : Int32) -> Bool {
   year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
 }
 
 ///|
-fn month_days(year : Int, month : Int) -> Int {
+fn month_days(year : Int32, month : Int32) -> Int32 {
   match month {
     2 => if leap_year(year) { 29 } else { 28 }
     4 | 6 | 9 | 11 => 30
@@ -26,7 +27,11 @@ fn month_days(year : Int, month : Int) -> Int {
 }
 
 ///|
-pub fn Date::new(year : Int, month : Int, day : Int) -> Result[Date, Issue] {
+pub fn Date::new(
+  year : Int32,
+  month : Int32,
+  day : Int32,
+) -> Result[Date, Issue] {
   if year < 1 || year > 9999 || month < 1 || month > 12 {
     return Err(
       issue("invalid_date", "date", "Year must be 1..9999 and month 1..12"),
@@ -41,7 +46,7 @@ pub fn Date::new(year : Int, month : Int, day : Int) -> Result[Date, Issue] {
 }
 
 ///|
-fn decimal_digits(text : String) -> Int? {
+fn decimal_digits(text : String) -> Int32? {
   if text.is_empty() {
     return None
   }
@@ -72,7 +77,7 @@ pub fn parse_date(text : String) -> Result[Date, Issue] {
 }
 
 ///|
-fn pad_decimal(number : Int, width : Int) -> String {
+fn pad_decimal(number : Int32, width : Int32) -> String {
   let text = number.to_string()
   let out = StringBuilder()
   for _ in 0..<(width - text.length()).max(0) {
@@ -92,13 +97,13 @@ pub fn Date::to_string(self : Date) -> String {
 }
 
 ///|
-fn days_before_year(year : Int) -> Int {
+fn days_before_year(year : Int32) -> Int32 {
   let previous = year - 1
   previous * 365 + previous / 4 - previous / 100 + previous / 400
 }
 
 ///|
-pub fn Date::ordinal(self : Date) -> Result[Int, Issue] {
+pub fn Date::ordinal(self : Date) -> Result[Int32, Issue] {
   match Date::new(self.year, self.month, self.day) {
     Err(error) => Err(error)
     Ok(_) => {
@@ -112,7 +117,7 @@ pub fn Date::ordinal(self : Date) -> Result[Int, Issue] {
 }
 
 ///|
-pub fn Date::add_days(self : Date, delta : Int) -> Result[Date, Issue] {
+pub fn Date::add_days(self : Date, delta : Int32) -> Result[Date, Issue] {
   let ordinal = match self.ordinal() {
     Ok(n) => n.to_int64() + delta.to_int64()
     Err(error) => return Err(error)

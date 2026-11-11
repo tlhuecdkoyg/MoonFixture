@@ -19,22 +19,24 @@ Fixture 是测试运行前准备好的数据和环境；MoonFixture 聚焦其中
 
 ## 工具链与验证环境
 
-本项目开发验证使用 **2026-09-21 从 MoonBit 官方发布通道下载的工具链**。以下是实际二进制版本，不以“最新稳定版”代替版本信息：
+本项目于 **2026-11-11** 使用 MoonBit 官方发布通道工具链完成 `0.1.2` 的本地兼容性验证。安装与 CI 固定工具链归档 **`0.10.20+65efd5b93`**；以下日期为各组件的构建日期：
 
 | 组件 | 版本 |
 | --- | --- |
-| moon | `0.1.20260920 (914d7da 2026-09-20)` |
-| moonc | `v0.10.14+7d59c7ec9 (2026-09-18)` |
-| moonrun | `0.1.20260920 (914d7da 2026-09-20)` |
-| CLI 依赖 | `moonbitlang/async 0.22.1`、`moonbitlang/x 0.5.5` |
-| 本地验证 | Windows / MSVC；Node.js `v26.5.1` |
+| moon | `0.1.20261104 (940aa18 2026-11-04)` |
+| moonc | `v0.10.20+65efd5b93 (2026-11-05)` |
+| moonrun | `0.1.20261104 (940aa18 2026-11-04)` |
+| CLI 依赖 | `moonbitlang/async 0.22.7`、`moonbitlang/x 0.5.7` |
+| 本地验证 | Windows / MSVC；Node.js `v26.5.1`；Python `3.12.13` |
 
-库支持 `wasm`、`wasm-gc`、`js`、`native`；CLI 仅支持 `native`。核心库只导入 MoonBit core；上述第三方模块供 CLI 使用。CI 在 Linux/Windows 上安装官方发布通道工具链并打印完整版本，用于发现后续兼容性变化；它不等于锁定本次验证版本。
+库支持 `wasm`、`wasm-gc`、`js`、`native`；CLI 仅支持 `native`。核心库只导入 MoonBit core；CLI 依赖 `moonbitlang/async@0.22.7` 和 `moonbitlang/x@0.5.7`。Linux/Windows CI 通过 `MOONBIT_INSTALL_VERSION` 安装上述固定归档并打印完整组件版本。其他工具链或依赖版本须重新验证。
+
+官方安装器见 [MoonBit 下载页](https://www.moonbitlang.com/download/)。安装时设置 `MOONBIT_INSTALL_VERSION=0.10.20+65efd5b93`，并以 `moon version --all` 核对实际组件版本。本轮本地维护结果及验证限制见[维护记录](docs/MAINTENANCE-20261111.md)；远程 CI 状态以对应提交的 GitHub Actions 结果为准。
 
 ## 作为库使用
 
 ```sh
-moon add tlhuecdkoyg/MoonFixture@0.1.1
+moon add tlhuecdkoyg/MoonFixture@0.1.2
 ```
 
 以下示例只在黑盒测试中引用库，在调用包的 `moon.pkg` 中加入测试依赖。业务实现文件中使用该库时，移除 `for "test"`，将其声明为普通依赖：
@@ -85,6 +87,7 @@ test "relational fixture" {
 ```sh
 moon update
 moon run cmd/main --target native -- --help
+moon run cmd/main --target native -- --version
 moon run cmd/main --target native -- generate examples/shop.json --seed 2026 --output shop-data.json
 moon run cmd/main --target native -- validate shop-data.json --model examples/shop.json
 moon run cmd/main --target native -- manifest examples/shop.json --seed 2026 --output replay.json
@@ -116,6 +119,11 @@ Python 仅作为独立验证消费者；所有模型解析、约束规划、随�
 ## 测试与代码统计
 
 ```sh
+moon check --target all --deny-warn
+moon build --target all --deny-warn
+moon test --target all --deny-warn
+moon fmt --check
+moon info
 python scripts/verify.py
 python scripts/count_lines.py --minimum 4000
 ```

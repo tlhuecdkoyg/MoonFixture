@@ -1,7 +1,7 @@
 ///|
 pub(all) struct ValidationReport {
   issues : Array[Issue]
-  checked_rows : Int
+  checked_rows : Int32
   truncated : Bool
 }
 
@@ -11,12 +11,12 @@ pub fn ValidationReport::is_valid(self : ValidationReport) -> Bool {
 }
 
 ///|
-fn validation_path(entity : String, index : Int, field : String) -> String {
+fn validation_path(entity : String, index : Int32, field : String) -> String {
   entity + "[" + index.to_string() + "]." + field
 }
 
 ///|
-fn value_matches(generator : Generator, value : Value, index : Int) -> Bool {
+fn value_matches(generator : Generator, value : Value, index : Int32) -> Bool {
   match (generator, value) {
     (Constant(expected), actual) => expected == actual
     (Sequence(start, step), Integer(actual)) =>
@@ -82,8 +82,8 @@ fn derived_matches(generator : Generator, row : Row, value : Value) -> Bool {
 pub fn validate_dataset(
   model : Model,
   data : Dataset,
-  max_issues? : Int = 100,
-  check_counts? : Bool = true,
+  max_issues~ : Int32 = 100,
+  check_counts~ : Bool = true,
 ) -> ValidationReport {
   let issues : Array[Issue] = []
   let mut checked_rows = 0

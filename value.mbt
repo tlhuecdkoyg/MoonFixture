@@ -1,18 +1,19 @@
 ///|
 /// Supported scalar values. Integers are restricted to portable signed Int32.
+#derive(Eq, Debug)
 pub(all) enum Value {
   Null
   Boolean(Bool)
-  Integer(Int)
+  Integer(Int32)
   Text(String)
-} derive(Eq, Debug)
+}
 
 ///|
 pub fn Value::to_json(self : Value) -> Json {
   match self {
     Null => Json::null()
     Boolean(value) => Json::boolean(value)
-    Integer(value) => value.to_json()
+    Integer(value) => Json(value)
     Text(value) => Json::string(value)
   }
 }
@@ -39,15 +40,17 @@ pub fn Value::key(self : Value) -> String {
 }
 
 ///|
+#derive(Eq, Debug)
 pub(all) struct Cell {
   name : String
   value : Value
-} derive(Eq, Debug)
+}
 
 ///|
+#derive(Eq, Debug)
 pub(all) struct Row {
   cells : Array[Cell]
-} derive(Eq, Debug)
+}
 
 ///|
 pub fn Row::get(self : Row, name : String) -> Value? {
@@ -69,11 +72,12 @@ pub fn Row::to_json(self : Row) -> Json {
 }
 
 ///|
+#derive(Eq, Debug)
 pub(all) struct Issue {
   code : String
   path : String
   message : String
-} derive(Eq, Debug)
+}
 
 ///|
 pub fn Issue::to_json(self : Issue) -> Json {

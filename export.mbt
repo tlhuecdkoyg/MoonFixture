@@ -85,7 +85,7 @@ pub fn Table::to_csv(self : Table, columns : Array[String]) -> String {
 ///|
 pub fn Table::batches(
   self : Table,
-  size : Int,
+  size : Int32,
 ) -> Result[Array[Array[Row]], Issue] {
   if size <= 0 {
     return Err(

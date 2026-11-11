@@ -1,9 +1,10 @@
 ///|
+#derive(Eq, Debug)
 pub(all) enum Override {
-  Count(String, Int)
+  Count(String, Int32)
   Generator(String, String, Generator)
-  Nullable(String, String, Int)
-} derive(Eq, Debug)
+  Nullable(String, String, Int32)
+}
 
 ///|
 pub extend Override with Eq::{equal, not_equal}
@@ -94,12 +95,13 @@ pub fn Model::with_scenario(
 }
 
 ///|
+#derive(Eq, Debug)
 pub(all) enum Mutation {
-  SetCell(String, Int, String, Value)
-  RemoveCell(String, Int, String)
-  DeleteRow(String, Int)
-  DuplicateRow(String, Int)
-} derive(Eq, Debug)
+  SetCell(String, Int32, String, Value)
+  RemoveCell(String, Int32, String)
+  DeleteRow(String, Int32)
+  DuplicateRow(String, Int32)
+}
 
 ///|
 pub extend Mutation with Eq::{equal, not_equal}

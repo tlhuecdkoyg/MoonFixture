@@ -16,19 +16,19 @@ pub(all) struct Options {
   input : String
   output : String?
   model_file : String?
-  seed : UInt
+  seed : UInt32
   reference_time : String
   format : String
   table : String?
-  batch_size : Int
-  max_input : Int
+  batch_size : Int32
+  max_input : Int32
   overwrite : Bool
 }
 
 pub(all) struct Output {
   text : String
   diagnostics : Array[String]
-  exit_code : Int
+  exit_code : Int32
 }
 
 // Type aliases

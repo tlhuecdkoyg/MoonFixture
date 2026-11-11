@@ -79,7 +79,7 @@ fn sqlite_create(entity : Entity) -> Result[String, Issue] {
 pub fn sqlite_bundle(
   model : Model,
   data : Dataset,
-  batch_size? : Int = 500,
+  batch_size~ : Int32 = 500,
 ) -> Result[SqliteBundle, Array[Issue]] {
   if batch_size <= 0 {
     return Err([

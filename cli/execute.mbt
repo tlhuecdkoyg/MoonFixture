@@ -2,7 +2,7 @@
 pub(all) struct Output {
   text : String
   diagnostics : Array[String]
-  exit_code : Int
+  exit_code : Int32
 }
 
 ///|
@@ -23,13 +23,13 @@ fn failure(issues : Array[@fixture.Issue]) -> Output {
 pub fn execute(
   input : String,
   options : Options,
-  model_text? : String = "",
+  model_text~ : String = "",
 ) -> Output {
   if options.command == "help" {
     return success(help())
   }
   if options.command == "version" {
-    return success("MoonFixture 0.1.1 (" + @fixture.algorithm_version() + ")")
+    return success("MoonFixture 0.1.2 (" + @fixture.algorithm_version() + ")")
   }
   if options.command == "replay" {
     return match @fixture.replay(input, max_units=options.max_input) {

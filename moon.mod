@@ -1,6 +1,6 @@
 name = "tlhuecdkoyg/MoonFixture"
 
-version = "0.1.1"
+version = "0.1.2"
 
 readme = "README.md"
 
@@ -13,6 +13,6 @@ description = "Reproducible relational test data construction for MoonBit."
 preferred_target = "wasm"
 
 import {
-  "moonbitlang/async@0.22.1",
-  "moonbitlang/x@0.5.5",
+  "moonbitlang/async@0.22.7",
+  "moonbitlang/x@0.5.7",
 }

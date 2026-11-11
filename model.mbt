@@ -1,63 +1,68 @@
 ///|
+#derive(Eq, Debug)
 pub(all) enum Generator {
   Constant(Value)
-  Sequence(Int, Int)
-  IntegerRange(Int, Int)
-  BooleanChance(Int)
+  Sequence(Int32, Int32)
+  IntegerRange(Int32, Int32)
+  BooleanChance(Int32)
   Choice(Array[Value])
-  WeightedChoice(Array[(Value, Int)])
-  Pattern(String, Int)
-  DateOffset(Int, Int)
+  WeightedChoice(Array[(Value, Int32)])
+  Pattern(String, Int32)
+  DateOffset(Int32, Int32)
   Reference(String, String)
   Copy(String)
   Add(String, String)
   Multiply(String, String)
   Concat(Array[String], String)
   Lookup(String, String, String, String)
-} derive(Eq, Debug)
+}
 
 ///|
+#derive(Eq, Debug)
 pub(all) struct Field {
   name : String
   generator : Generator
   unique : Bool
   primary : Bool
-  null_per_mille : Int
-} derive(Eq, Debug)
+  null_per_mille : Int32
+}
 
 ///|
 pub fn Field::new(
   name : String,
   generator : Generator,
-  unique? : Bool = false,
-  primary? : Bool = false,
-  null_per_mille? : Int = 0,
+  unique~ : Bool = false,
+  primary~ : Bool = false,
+  null_per_mille~ : Int32 = 0,
 ) -> Field {
   { name, generator, unique: unique || primary, primary, null_per_mille, }
 }
 
 ///|
+#derive(Eq, Debug)
 pub(all) struct Entity {
   name : String
-  count : Int
+  count : Int32
   fields : Array[Field]
-} derive(Eq, Debug)
+}
 
 ///|
+#derive(Eq, Debug)
 pub(all) struct Model {
   name : String
   entities : Array[Entity]
-} derive(Eq, Debug)
+}
 
 ///|
+#derive(Eq, Debug)
 pub(all) struct Limits {
-  max_entities : Int
-  max_fields : Int
-  max_rows : Int
-  max_cells : Int
-  max_attempts : Int
-  max_text_units : Int
-} derive(Eq, Debug)
+  max_entities : Int32
+  max_fields : Int32
+  max_rows : Int32
+  max_cells : Int32
+  max_attempts : Int32
+  max_text_units : Int32
+}
 
 ///|
 pub fn Limits::default() -> Limits {
@@ -72,35 +77,38 @@ pub fn Limits::default() -> Limits {
 }
 
 ///|
+#derive(Eq, Debug)
 pub(all) struct Context {
-  seed : UInt
+  seed : UInt32
   reference_time : String
   limits : Limits
-} derive(Eq, Debug)
+}
 
 ///|
 pub fn Context::new(
-  seed : UInt,
-  reference_time? : String = "2026-01-01T00:00:00Z",
-  limits? : Limits = Limits::default(),
+  seed : UInt32,
+  reference_time~ : String = "2026-01-01T00:00:00Z",
+  limits~ : Limits = Limits::default(),
 ) -> Context {
   { seed, reference_time, limits, }
 }
 
 ///|
+#derive(Eq, Debug)
 pub(all) struct Table {
   name : String
   rows : Array[Row]
-} derive(Eq, Debug)
+}
 
 ///|
+#derive(Eq, Debug)
 pub(all) struct Dataset {
   model : String
-  seed : UInt
+  seed : UInt32
   algorithm : String
   reference_time : String
   tables : Array[Table]
-} derive(Eq, Debug)
+}
 
 ///|
 pub fn Dataset::table(self : Dataset, name : String) -> Table? {

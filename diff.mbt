@@ -93,7 +93,7 @@ pub fn compare_datasets(
   model : Model,
   before : Dataset,
   after : Dataset,
-  max_differences? : Int = 100,
+  max_differences~ : Int32 = 100,
 ) -> Result[Comparison, Issue] {
   if compile(model) is Err(errors) {
     return Err(errors[0])

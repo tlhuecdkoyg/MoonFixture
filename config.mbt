@@ -1,7 +1,8 @@
 ///|
+#derive(Debug)
 pub suberror ConfigError {
   InvalidConfig(String, String)
-} derive(Debug)
+}
 
 ///|
 pub extend ConfigError with @moonbitlang/core/debug.Debug::{to_repr}
@@ -39,7 +40,7 @@ fn text_value(value : Json, path : String) -> String raise ConfigError {
 }
 
 ///|
-fn integer_value(value : Json, path : String) -> Int raise ConfigError {
+fn integer_value(value : Json, path : String) -> Int32 raise ConfigError {
   match value {
     Number(number, ..) => {
       if number < -2147483648.0 || number > 2147483647.0 {
@@ -104,7 +105,7 @@ fn parse_generator(value : Json, path : String) -> Generator raise ConfigError {
   fn text(name : String) -> String raise ConfigError {
     text_value(required(fields, name, path), path + "." + name)
   }
-  fn int(name : String) -> Int raise ConfigError {
+  fn int(name : String) -> Int32 raise ConfigError {
     integer_value(required(fields, name, path), path + "." + name)
   }
   let allowed = match kind {
@@ -143,7 +144,7 @@ fn parse_generator(value : Json, path : String) -> Generator raise ConfigError {
         required(fields, "values", path),
         path + ".values",
       )
-      let values : Array[(Value, Int)] = []
+      let values : Array[(Value, Int32)] = []
       for index in 0..<items.length() {
         let item_path = path + ".values[" + index.to_string() + "]"
         let item = object_fields(items[index], item_path)
@@ -241,7 +242,7 @@ fn decode_model(value : Json) -> Model raise ConfigError {
 ///|
 pub fn parse_model(
   text : String,
-  max_units? : Int = 1048576,
+  max_units~ : Int32 = 1048576,
 ) -> Result[Model, Issue] {
   if guard_json(text, max_units, "model") is Err(error) {
     return Err(error)

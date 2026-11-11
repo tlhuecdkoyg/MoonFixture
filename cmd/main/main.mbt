@@ -4,7 +4,7 @@ suberror InputError {
 }
 
 ///|
-async fn read_text(reader : &@io.Reader, limit : Int) -> String {
+async fn read_text(reader : &@io.Reader, limit : Int32) -> String {
   let chunks : Array[Bytes] = []
   let mut total = 0
   for ;; {
@@ -32,7 +32,7 @@ async fn read_text(reader : &@io.Reader, limit : Int) -> String {
 }
 
 ///|
-async fn load(path : String, limit : Int) -> String {
+async fn load(path : String, limit : Int32) -> String {
   if path == "-" {
     return read_text(@stdio.stdin, limit)
   }
@@ -45,7 +45,7 @@ async fn load(path : String, limit : Int) -> String {
 }
 
 ///|
-async fn run() -> Int {
+async fn run() -> Int32 {
   let args = @env.args()
   let options = match @cli.parse_args(args[1:].to_owned()) {
     Ok(options) => options

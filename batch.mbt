@@ -1,7 +1,7 @@
 ///|
 pub(all) struct BatchProgress {
-  rows_accepted : Int
-  batches_accepted : Int
+  rows_accepted : Int32
+  batches_accepted : Int32
   completed : Bool
 }
 
@@ -11,9 +11,9 @@ pub(all) struct BatchProgress {
 /// rolled back. This bounds export buffering, not the retained dataset itself.
 pub fn Table::visit_batches(
   self : Table,
-  size : Int,
+  size : Int32,
   consume : (Array[Row]) -> Bool,
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> Result[BatchProgress, Issue] {
   if size <= 0 {
     return Err(
@@ -55,9 +55,9 @@ pub fn Table::visit_batches(
 /// by accepted row count. Callers are responsible for durable write semantics.
 pub fn Table::visit_ndjson(
   self : Table,
-  size : Int,
+  size : Int32,
   consume : (String) -> Bool,
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> Result[BatchProgress, Issue] {
   self.visit_batches(
     size,
@@ -79,9 +79,9 @@ pub fn Table::visit_ndjson(
 pub fn Table::visit_csv(
   self : Table,
   columns : Array[String],
-  size : Int,
+  size : Int32,
   consume : (String) -> Bool,
-  offset? : Int = 0,
+  offset~ : Int32 = 0,
 ) -> Result[BatchProgress, Issue] {
   let mut first = offset == 0
   if self.rows.is_empty() && offset == 0 && size > 0 {

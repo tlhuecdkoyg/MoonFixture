@@ -3,7 +3,7 @@
 /// do not count. Syntax and escape validity remain the JSON parser's job.
 fn guard_json(
   text : String,
-  max_units : Int,
+  max_units : Int32,
   path : String,
 ) -> Result[Unit, Issue] {
   if max_units <= 0 || text.length() > max_units {

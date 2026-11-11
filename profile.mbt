@@ -1,30 +1,30 @@
 ///|
 pub(all) struct FieldProfile {
   name : String
-  present : Int
-  missing : Int
-  nulls : Int
-  booleans : Int
-  true_values : Int
-  integers : Int
-  texts : Int
-  distinct : Int
-  min_integer : Int?
-  max_integer : Int?
+  present : Int32
+  missing : Int32
+  nulls : Int32
+  booleans : Int32
+  true_values : Int32
+  integers : Int32
+  texts : Int32
+  distinct : Int32
+  min_integer : Int32?
+  max_integer : Int32?
   sum_integer : Int64
-  min_text_length : Int?
-  max_text_length : Int?
+  min_text_length : Int32?
+  max_text_length : Int32?
 }
 
 ///|
 pub(all) struct TableProfile {
   name : String
-  rows : Int
+  rows : Int32
   fields : Array[FieldProfile]
 }
 
 ///|
-fn minimum(current : Int?, value : Int) -> Int? {
+fn minimum(current : Int32?, value : Int32) -> Int32? {
   Some(
     match current {
       Some(old) => old.min(value)
@@ -34,7 +34,7 @@ fn minimum(current : Int?, value : Int) -> Int? {
 }
 
 ///|
-fn maximum(current : Int?, value : Int) -> Int? {
+fn maximum(current : Int32?, value : Int32) -> Int32? {
   Some(
     match current {
       Some(old) => old.max(value)
@@ -64,11 +64,11 @@ pub fn Table::profile(self : Table) -> TableProfile {
     let mut true_values = 0
     let mut integers = 0
     let mut texts = 0
-    let mut min_integer : Int? = None
-    let mut max_integer : Int? = None
+    let mut min_integer : Int32? = None
+    let mut max_integer : Int32? = None
     let mut sum_integer = 0L
-    let mut min_text_length : Int? = None
-    let mut max_text_length : Int? = None
+    let mut min_text_length : Int32? = None
+    let mut max_text_length : Int32? = None
     let distinct : Map[String, Bool] = Map([])
     for row in self.rows {
       match row.get(name) {
@@ -121,7 +121,7 @@ pub fn Table::profile(self : Table) -> TableProfile {
 }
 
 ///|
-fn optional_number(value : Int?) -> Json {
+fn optional_number(value : Int32?) -> Json {
   match value {
     Some(number) => Json::number(number.to_double())
     None => Json::null()

@@ -1,11 +1,12 @@
 ///|
 /// A plan owns a deep snapshot of its validated model.
+#derive(Debug)
 pub struct Plan {
   model : Model
   context : Context
-  entity_order : Array[Int]
-  field_orders : Array[Array[Int]]
-} derive(Debug)
+  entity_order : Array[Int32]
+  field_orders : Array[Array[Int32]]
+}
 
 ///|
 pub fn Plan::entity_names(self : Plan) -> Array[String] {
@@ -17,8 +18,8 @@ fn ordered_nodes(
   names : Array[String],
   dependencies : Array[Array[String]],
   path : String,
-) -> Result[Array[Int], Array[Issue]] {
-  let order : Array[Int] = []
+) -> Result[Array[Int32], Array[Issue]] {
+  let order : Array[Int32] = []
   let visited : Map[String, Bool] = Map([])
   while order.length() < names.length() {
     let before = order.length()
@@ -120,7 +121,7 @@ fn check_generator(generator : Generator, path : String) -> Array[Issue] {
 /// Validate names, cardinalities, references and DAGs before generating rows.
 pub fn compile(
   model : Model,
-  context? : Context = Context::new(1U),
+  context~ : Context = Context::new(1U),
 ) -> Result[Plan, Array[Issue]] {
   let errors : Array[Issue] = []
   let limits = context.limits
@@ -316,7 +317,7 @@ pub fn compile(
     Ok(order) => order
     Err(errors) => return Err(errors)
   }
-  let field_orders : Array[Array[Int]] = []
+  let field_orders : Array[Array[Int32]] = []
   for entity in model.entities {
     match
       ordered_nodes(

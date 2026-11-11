@@ -1,13 +1,13 @@
 ///|
 /// Assertions over finished fixtures, independent of the generation model.
 pub(all) enum Expectation {
-  RowCount(String, Int, Int)
+  RowCount(String, Int32, Int32)
   NonNull(String, String)
-  IntegerBounds(String, String, Int, Int)
-  TextLength(String, String, Int, Int)
+  IntegerBounds(String, String, Int32, Int32)
+  TextLength(String, String, Int32, Int32)
   LessEqual(String, String, String)
   SumEquals(String, String, Int64)
-  RelatedCount(String, String, String, String, Int, Int)
+  RelatedCount(String, String, String, String, Int32, Int32)
 }
 
 ///|
@@ -16,7 +16,7 @@ pub(all) enum Expectation {
 pub fn check_expectations(
   data : Dataset,
   expectations : Array[Expectation],
-  max_issues? : Int = 100,
+  max_issues~ : Int32 = 100,
 ) -> ValidationReport {
   let issues : Array[Issue] = []
   let mut truncated = false
@@ -172,7 +172,7 @@ pub fn check_expectations(
             continue
           }
         }
-        let counts : Map[String, Int] = Map([])
+        let counts : Map[String, Int32] = Map([])
         for ri in 0..<parent.rows.length() {
           checked_rows += 1
           match parent.rows[ri].get(parent_key) {
